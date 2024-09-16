@@ -31,6 +31,7 @@ app.post("/subscribe", (req, res) => {
   sendNotification(subscription, payload).catch((err) => console.error(err));
 });
 
+// Backend Logic to store and manage item details
 app.post("/items", (req, res) => {
   const item = new Item(req.body);
   item.save()
@@ -40,6 +41,58 @@ app.post("/items", (req, res) => {
     .catch((err) => {
       console.error(err);
       res.status(500).json({ message: "Error saving item" });
+    });
+});
+
+app.get("/items", (req, res) => {
+  Item.find()
+    .then((items) => {
+      res.json({ message: "Items retrieved successfully", data: items });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Error retrieving items" });
+    });
+});
+
+app.get("/items/:id", (req, res) => {
+  const itemId = req.params.id;
+  Item.findById(itemId)
+    .then((item) => {
+      if (!item) {
+        res.status(404).json({ message: "Item not found" });
+      } else {
+        res.json({ message: "Item retrieved successfully", data: item });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Error retrieving item" });
+    });
+});
+
+app.put("/items/:id", (req, res) => {
+  const itemId = req.params.id;
+  const updatedItem = req.body;
+  Item.findByIdAndUpdate(itemId, updatedItem, { new: true })
+    .then((item) => {
+      res.json({ message: "Item updated successfully", data: item });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Error updating item" });
+    });
+});
+
+app.delete("/items/:id", (req, res) => {
+  const itemId = req.params.id;
+  Item.findByIdAndRemove(itemId)
+    .then(() => {
+      res.json({ message: "Item deleted successfully" });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Error deleting item" });
     });
 });
 
