@@ -31,7 +31,7 @@ app.post("/subscribe", (req, res) => {
   sendNotification(subscription, payload).catch((err) => console.error(err));
 });
 
-// Backend Logic to store and manage item details
+// Backend Logic to store and manage items
 app.post("/items", (req, res) => {
   const item = new Item(req.body);
   item.save()
@@ -55,9 +55,9 @@ app.get("/items", (req, res) => {
     });
 });
 
-app.get("/items/:id", (req, res) => {
-  const itemId = req.params.id;
-  Item.findById(itemId)
+app.get("/items/:name", (req, res) => {
+  const name = req.params.name;
+  Item.findOne({ name: name })
     .then((item) => {
       if (!item) {
         res.status(404).json({ message: "Item not found" });
@@ -71,10 +71,10 @@ app.get("/items/:id", (req, res) => {
     });
 });
 
-app.put("/items/:id", (req, res) => {
-  const itemId = req.params.id;
+app.put("/items/:name", (req, res) => {
+  const name = req.params.name;
   const updatedItem = req.body;
-  Item.findByIdAndUpdate(itemId, updatedItem, { new: true })
+  Item.findOneAndUpdate({ name: name }, updatedItem, { new: true })
     .then((item) => {
       res.json({ message: "Item updated successfully", data: item });
     })
@@ -84,9 +84,9 @@ app.put("/items/:id", (req, res) => {
     });
 });
 
-app.delete("/items/:id", (req, res) => {
-  const itemId = req.params.id;
-  Item.findByIdAndRemove(itemId)
+app.delete("/items/:name", (req, res) => {
+  const name = req.params.name;
+  Item.findOneAndDelete({ name: name })
     .then(() => {
       res.json({ message: "Item deleted successfully" });
     })
