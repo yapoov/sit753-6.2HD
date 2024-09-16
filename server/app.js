@@ -2,6 +2,7 @@ const express = require("express");
 const authRoutes = require("./src/routes/authRoutes");
 const { protect } = require("./src/controllers/authController");
 const { sendNotification } = require("./src/utils/notificationUtils");
+const Item = require("./src/models/itemModel");
 
 const app = express();
 require("dotenv").config();
@@ -28,6 +29,18 @@ app.post("/subscribe", (req, res) => {
   res.status(201).json({ message: "Subscription saved" });
   const payload = JSON.stringify({ title: "Push Test" });
   sendNotification(subscription, payload).catch((err) => console.error(err));
+});
+
+app.post("/items", (req, res) => {
+  const item = new Item(req.body);
+  item.save()
+    .then((item) => {
+      res.status(201).json({ message: "Item saved successfully", data: item });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Error saving item" });
+    });
 });
 
 const PORT = process.env.PORT || 3145;
