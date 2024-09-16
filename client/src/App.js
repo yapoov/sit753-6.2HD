@@ -14,6 +14,9 @@ import Home from "./pages/home";
 
 import { Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
+import Navbar from "./components/navbar";
+import ManualItemEntry from "./pages/manualEntry";
+import Profile from "./pages/profile";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -36,6 +39,25 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+                <Navbar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+                <Navbar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manual-entry"
+            element={
+              <ProtectedRoute>
+                <ManualItemEntry />
+                <Navbar />
               </ProtectedRoute>
             }
           />

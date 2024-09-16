@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../App.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import InputField from "../components/inputField";
 import { useAuth } from "../hooks/useAuth";
 
@@ -8,7 +8,6 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const navigate = useNavigate();
   const [serverError, setServerError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
