@@ -2,6 +2,7 @@ const express = require("express");
 const authRoutes = require("./src/routes/authRoutes");
 const { protect } = require("./src/controllers/authController");
 const { sendNotification } = require("./src/utils/notificationUtils");
+const User = require("./src/models/userModel");
 const Item = require("./src/models/itemModel");
 
 const app = express();
@@ -31,69 +32,57 @@ app.post("/subscribe", (req, res) => {
   sendNotification(subscription, payload).catch((err) => console.error(err));
 });
 
-// Backend Logic to store and manage items
-app.post("/items", (req, res) => {
-  const item = new Item(req.body);
-  item.save()
-    .then((item) => {
-      res.status(201).json({ message: "Item saved successfully", data: item });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Error saving item" });
-    });
+// Backend Logic to store and manage items under specific user's documents
+app.post("/items", protect, async (req, res) => {
+  const item = req.body;
+  if (!req.user.items) {
+    req.user.items = [];
+  }
+  req.user.items.push(item);
+  await req.user.save();
+  res.status(201).json({ message: "Item saved successfully", data: req.user.items });
 });
 
-app.get("/items", (req, res) => {
-  Item.find()
-    .then((items) => {
-      res.json({ message: "Items retrieved successfully", data: items });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Error retrieving items" });
-    });
+app.get("/items", protect, async (req, res) => {
+  res.json({
+    message: "Items retrieved successfully",
+    data: req.user.items
+  });
 });
 
-app.get("/items/:name", (req, res) => {
+app.get("/items/:name", protect, async (req, res) => {
   const name = req.params.name;
-  Item.findOne({ name: name })
-    .then((item) => {
-      if (!item) {
-        res.status(404).json({ message: "Item not found" });
-      } else {
-        res.json({ message: "Item retrieved successfully", data: item });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Error retrieving item" });
-    });
+  const item = req.user.items.find((item) => item.name === name);
+  if (!item) {
+    res.status(404).json({ message: "Item not found" });
+  } else {
+    res.json({ message: "Item retrieved successfully", data: item });
+  }
 });
 
-app.put("/items/:name", (req, res) => {
+app.put("/items/:name", protect, async (req, res) => {
   const name = req.params.name;
   const updatedItem = req.body;
-  Item.findOneAndUpdate({ name: name }, updatedItem, { new: true })
-    .then((item) => {
-      res.json({ message: "Item updated successfully", data: item });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Error updating item" });
-    });
+  const item = req.user.items.find((item) => item.name === name);
+  if (!item) {
+    res.status(404).json({ message: "Item not found" });
+  } else {
+    Object.assign(item, updatedItem);
+    await req.user.save();
+    res.json({ message: "Item updated successfully", data: item });
+  }
 });
 
-app.delete("/items/:name", (req, res) => {
+app.delete("/items/:name", protect, async (req, res) => {
   const name = req.params.name;
-  Item.findOneAndDelete({ name: name })
-    .then(() => {
-      res.json({ message: "Item deleted successfully" });
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Error deleting item" });
-    });
+  const item = req.user.items.find((item) => item.name === name);
+  if (!item) {
+    res.status(404).json({ message: "Item not found" });
+  } else {
+    req.user.items.pull(item);
+    await req.user.save();
+    res.json({ message: "Item deleted successfully" });
+  }
 });
 
 const PORT = process.env.PORT || 3145;

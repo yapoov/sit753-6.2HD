@@ -27,6 +27,6 @@ itemSchema.virtual("expired").get(function () {
   return this.expiryDate < Date.now();
 });
 
-const Item = mongoose.model("Item", itemSchema);
+const Item = mongoose.model('Item', itemSchema);
 
 module.exports = Item;

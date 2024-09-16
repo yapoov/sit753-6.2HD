@@ -1,17 +1,25 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const itemSchema = require("./itemModel");
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
     unique: true,
-    trim: true,
   },
   password: {
     type: String,
     required: true,
   },
+  // Define the items array
+  items: [{
+    name: String,
+    expiryDate: String,
+    purchaseDate: String,
+    quantity: String,
+    description: String,
+  }],
 });
 
 // Hash the password before saving the user
