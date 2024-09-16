@@ -53,7 +53,7 @@ const Signup = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        await login(data);
+        await login(data.token);
       } else {
         setServerError(data.message || "Register failed. Please try again.");
       }

@@ -43,15 +43,13 @@ const Login = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        await login(data);
+        await login(data.token);
       } else {
         setServerError(data.message || "Login failed. Please try again.");
       }
     } catch (err) {
       setServerError("An error occurred. Please try again later.");
     }
-
-    console.log({ email, password });
   };
 
   return (

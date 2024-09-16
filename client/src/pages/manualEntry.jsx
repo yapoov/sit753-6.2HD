@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../App.css";
 import InputField from "../components/inputField";
 import Header from "../components/header";
+import api from "../api";
 
 const ManualItemEntry = () => {
   const [itemName, setItemName] = useState("");
@@ -9,13 +10,28 @@ const ManualItemEntry = () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [purchaseDate, setPurchaseDate] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setItemNameError("");
 
     if (!itemName) {
       setItemNameError("please enter item name");
+      return;
     }
+
+    try {
+      const res = await api.post("/items", {
+        name: itemName,
+        expiryDate,
+        purchaseDate,
+        quantity: 1,
+      });
+      const data = await res.json();
+      console.log(data);
+      if (res.ok) {
+      } else {
+      }
+    } catch (e) {}
     setItemName("");
     setExpiryDate("");
   };
@@ -34,6 +50,7 @@ const ManualItemEntry = () => {
                     className=" border-b-2 text-center border-teal-500"
                     placeholder={"Item name"}
                     error={itemNameError}
+                    value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
                   />
                 </div>
@@ -48,6 +65,7 @@ const ManualItemEntry = () => {
                   type="date"
                   class=" bg-teal-100 px-4 py-2 rounded-lg"
                   placeholder="Select date"
+                  onChange={(e) => setExpiryDate(e.target.value)}
                 ></input>
               </div>
               <div class="relative my-4 flex max-w-sm items-baseline justify-between">
@@ -56,6 +74,8 @@ const ManualItemEntry = () => {
                   type="date"
                   class=" bg-teal-100  px-4 py-2 rounded-lg"
                   placeholder="Select date"
+                  value={purchaseDate}
+                  onChange={(e) => setPurchaseDate(e.target.value)}
                 ></input>
               </div>
             </div>
