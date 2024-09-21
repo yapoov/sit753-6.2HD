@@ -44,9 +44,13 @@ app.post("/items", protect, async (req, res) => {
 });
 
 app.get("/items", protect, async (req, res) => {
+  let data = req.user.items;
+  if(req.query.filterDate != "") {
+    data = data.filter(item => item.expiryDate == req.query.filterDate);
+  }
   res.json({
     message: "Items retrieved successfully",
-    data: req.user.items
+    data: data
   });
 });
 
